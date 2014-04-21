@@ -1,24 +1,28 @@
-var FsmModule = function(module){
-    jQuery.extend(module.prototype, {
-        initTransitionBus: function(){
-            this.stateTransitionBus = new jQuery.Deferred();
+define([
+    "jquery"
+], function(jQuery){
+    return function(module){
+        jQuery.extend(module.prototype, {
+            initTransitionBus: function(){
+                this.stateTransitionBus = new jQuery.Deferred();
 
-            this.onTransition = this.stateTransitionBus.progress.bind(this);
+                this.onTransition = this.stateTransitionBus.progress.bind(this);
 
-            this.transitionState("initializing");
-        },
+                this.transitionState("initializing");
+            },
 
-        transitionState: function(newState){
-            var oldState = this.state;
+            transitionState: function(newState){
+                var oldState = this.state;
 
-            this.state = newState;
+                this.state = newState;
 
-            this.stateTransitionBus.notify({
-                from: oldState,
-                to:   newState
-            });
-        }
-    });
+                this.stateTransitionBus.notify({
+                    from: oldState,
+                    to:   newState
+                });
+            }
+        });
 
-    return module;
-};
+        return module;
+    };
+});

@@ -1,83 +1,99 @@
-var ApePI = function(options){
-    var self = this;
+define([
+    "jquery",
+    "fsm",
+    "hold_manager",
+    "queue_manager",
+    "request_throttler"
+], function (
+    jQuery,
+    FsmModule,
+    HoldManager,
+    QueueManager,
+    RequestThrottler
+) {
+    var ApePI = function(options){
+        var self = this;
 
-    this.options = jQuery.extend({
-        debug: false
-    }, options);
+        this.options = jQuery.extend({
+            debug: false
+        }, options);
 
-    this.initTransitionBus();
-    this.initRequestThrottler();
-    this.initHoldManager();
-    this.initQueueManager();
+        this.initTransitionBus();
+        this.initRequestThrottler();
+        this.initHoldManager();
+        this.initQueueManager();
 
-    this.onTransition(function(){
-        self.handleTransition.apply(self, arguments);
-    });
-
-    this.requestThrottler.onTransition(function(){
-        self.evaluateReadiness();
-    });
-
-    this.holdManager.onTransition(function(){
-        self.evaluateReadiness();
-    });
-};
-
-FsmModule(ApePI);
-
-jQuery.extend(ApePI.prototype, {
-    initRequestThrottler: function(){
-        this.requestThrottler = new RequestThrottler({
-            debug: this.options.debug
+        this.onTransition(function(){
+            self.handleTransition.apply(self, arguments);
         });
-    },
 
-    initHoldManager: function(){
-        this.holdManager = new HoldManager({
-            debug: this.options.debug
+        this.requestThrottler.onTransition(function(){
+            self.evaluateReadiness();
         });
-    },
 
-    initQueueManager: function(){
-        this.queueManager = new QueueManager({
-            debug:          this.options.debug,
-            requestHandler: this.options.requestHandler
+        this.holdManager.onTransition(function(){
+            self.evaluateReadiness();
         });
-    },
+    };
 
-    evaluateReadiness: function(){
-        var isReady  = this.requestThrottler.state === "stable" &&
-                       this.holdManager.state      === "ready";
+    FsmModule(ApePI);
 
-        var newState = isReady ? "ready" : "settling";
+    jQuery.extend(ApePI.prototype, {
+        initRequestThrottler: function(){
+            this.requestThrottler = new RequestThrottler({
+                debug: this.options.debug
+            });
+        },
 
-        if (this.state === newState) return;
+        initHoldManager: function(){
+            this.holdManager = new HoldManager({
+                debug: this.options.debug
+            });
+        },
 
-        this.transitionState(newState);
-    },
+        initQueueManager: function(){
+            this.queueManager = new QueueManager({
+                debug:          this.options.debug,
+                requestHandler: this.options.requestHandler
+            });
+        },
 
-    addRequest: function(request){
-        var promise = this.queueManager.add(request);
+        evaluateReadiness: function(){
+            var isReady  = this.requestThrottler.state === "stable" &&
+                           this.holdManager.state      === "ready";
 
-        this.requestThrottler.destabilize();
+            var newState = isReady ? "ready" : "settling";
 
-        return promise;
-    },
+            if (this.state === newState) return;
 
-    addHold: function(){
-        return this.holdManager.add();
-    },
+            this.transitionState(newState);
+        },
 
-    handleTransition: function(event){
-        this.log("Master: transitioned from", event.from, "to", event.to);
+        addRequest: function(request){
+            var promise = this.queueManager.add(request);
 
-        if (event.to === "ready"){
-            this.queueManager.flushAll();
+            this.requestThrottler.destabilize();
+
+            return promise;
+        },
+
+        addHold: function(){
+            return this.holdManager.add();
+        },
+
+        handleTransition: function(event){
+            this.log("ApePI Master: transitioned from", event.from, "to", event.to);
+
+            if (event.to === "ready"){
+                this.queueManager.flushAll();
+            }
+        },
+
+        log: function(){
+            if (!this.options.debug) return;
+            console.log.apply(console, arguments);
         }
-    },
+    });
 
-    log: function(){
-        if (!this.options.debug) return;
-        console.log.apply(console, arguments);
-    }
+    return ApePI;
 });
