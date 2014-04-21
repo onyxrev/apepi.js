@@ -1,6 +1,8 @@
 ApePI: A Private Eye for Your API
 =====
 
+![Ape PI](http://i.imgur.com/d1JQNNC.jpg)
+
 Javascript Client API middleware that handles throttling, queuing, request deduplication, and arbitrary holds
 
 Get Started
