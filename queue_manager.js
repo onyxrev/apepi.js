@@ -32,6 +32,9 @@ define([
             var promise = this.createPromise();
             var queue   = this.getOrCreateQueue(requestParams);
 
+            // add on the queue
+            promise.queue = queue;
+
             queue.promises.push(promise);
 
             this.log("ApePI QueueManager: enqueued request", requestParams);

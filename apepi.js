@@ -15,11 +15,11 @@ define([
         var self = this;
 
         this.options = jQuery.extend({
-            debug: false
+            debug:    false,
+            debounce: false
         }, options);
 
         this.initTransitionBus();
-        this.initRequestThrottler();
         this.initHoldManager();
         this.initQueueManager();
 
@@ -27,9 +27,13 @@ define([
             self.handleTransition.apply(self, arguments);
         });
 
-        this.requestThrottler.onTransition(function(){
-            self.evaluateReadiness();
-        });
+        if (this.options.debounce){
+            this.initRequestThrottler();
+
+            this.requestThrottler.onTransition(function(){
+                self.evaluateReadiness();
+            });
+        }
 
         this.holdManager.onTransition(function(){
             self.evaluateReadiness();
@@ -59,8 +63,8 @@ define([
         },
 
         evaluateReadiness: function(){
-            var isReady  = this.requestThrottler.state === "stable" &&
-                           this.holdManager.state      === "ready";
+            var isThrottled = this.requestThrottler && this.requestThrottler.state === "unstable";
+            var isReady     = !isThrottled && this.holdManager.state === "ready";
 
             var newState = isReady ? "ready" : "settling";
 
@@ -72,9 +76,19 @@ define([
         addRequest: function(request){
             var promise = this.queueManager.add(request);
 
-            this.requestThrottler.destabilize();
+            if (this.options.debounce){
+                this.requestThrottler.destabilize();
+            }
+
+            this.onRequestAdd(promise);
 
             return promise;
+        },
+
+        onRequestAdd: function(promise){
+            if (this.state !== "ready") return;
+
+            promise.queue.flush();
         },
 
         addHold: function(){
