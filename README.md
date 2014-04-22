@@ -48,7 +48,7 @@ var hold = apePI.addHold();
 Add a request:
 
 ```javascript
-var request = apiePI.addRequest({
+var request = apePI.addRequest({
     url: "/not/yet"
 });
 ```
@@ -73,11 +73,11 @@ var hold = apePI.addHold();
 Add two identical requests:
 
 ```javascript
-var request1 = apiePI.addRequest({
+var request1 = apePI.addRequest({
     url: "/not/yet"
 });
 
-var request2 = apiePI.addRequest({
+var request2 = apePI.addRequest({
     url: "/not/yet"
 });
 
