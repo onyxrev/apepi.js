@@ -1,6 +1,7 @@
 define([
-    "jquery"
-], function(jQuery){
+    "jquery",
+    "ordered_stringify"
+], function(jQuery, orderedStringify){
     var QueueManager = function(options){
         this.options = jQuery.extend({
             requestHandler: jQuery.ajax,
@@ -15,17 +16,12 @@ define([
             return this.enqueue(requestParams);
         },
 
-        // we'll take the request URL, params, data, headers and produce a
-        // hash of all that information so that in the future we can
-        // determine whether the request is unique or redundant
         hashRequest: function(requestParams){
             return this.hash(requestParams);
         },
 
         hash: function hash(value) {
-            return (typeof value) + ' ' + (value instanceof Object ?
-                                           (value.__hash || (value.__hash = ++arguments.callee.current)) :
-                                           value.toString());
+            return orderedStringify(value);
         },
 
         enqueue: function(requestParams){
