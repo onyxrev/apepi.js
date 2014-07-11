@@ -1,6 +1,6 @@
 define([
     "jquery",
-    "ordered_stringify"
+    "./ordered_stringify"
 ], function(jQuery, orderedStringify){
     var QueueManager = function(options){
         this.options = jQuery.extend({

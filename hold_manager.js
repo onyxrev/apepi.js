@@ -1,6 +1,6 @@
 define([
     "jquery",
-    "fsm"
+    "./fsm"
 ], function(
     jQuery,
     FsmModule

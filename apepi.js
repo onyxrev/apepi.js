@@ -1,9 +1,9 @@
 define([
     "jquery",
-    "fsm",
-    "hold_manager",
-    "queue_manager",
-    "request_throttler"
+    "./fsm",
+    "./hold_manager",
+    "./queue_manager",
+    "./request_throttler"
 ], function (
     jQuery,
     FsmModule,
