@@ -45,7 +45,8 @@ define([
     jQuery.extend(ApePI.prototype, {
         initRequestThrottler: function(){
             this.requestThrottler = new RequestThrottler({
-                debug: this.options.debug
+                debug:           this.options.debug,
+                debounceTimeout: this.options.debounceTimeout
             });
         },
 
