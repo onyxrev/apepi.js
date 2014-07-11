@@ -33,7 +33,7 @@ define([
 
             queue.promises.push(promise);
 
-            this.log("ApePI QueueManager: enqueued request", requestParams);
+            this.log("ApePI QueueManager: enqueued request", requestParams, "for a total of", queue.promises.length, "deduplicated requests");
 
             return promise;
         },
